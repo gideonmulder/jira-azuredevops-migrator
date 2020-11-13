@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 using Atlassian.Jira;
 
-
 using Migration.Common;
 using Migration.Common.Log;
 
@@ -16,20 +15,23 @@ using RestSharp;
 
 namespace JiraExport
 {
-    public class JiraProvider
+    public class JiraProvider : IJiraProvider
     {
         [Flags]
         public enum DownloadOptions
         {
             None = 0,
+
             IncludeParentEpics = 1,
+
             IncludeParents = 2,
+
             IncludeSubItems = 4
         }
 
         private readonly string JiraApiV2 = "rest/api/2";
 
-        readonly Dictionary<string, string> _userEmailCache = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _userEmailCache = new Dictionary<string, string>();
 
         public Jira Jira { get; private set; }
 
@@ -54,7 +56,6 @@ namespace JiraExport
             {
                 provider.LinkTypes = provider.Jira.Links.GetLinkTypesAsync().Result;
             }
-
             catch (Exception e)
             {
                 Logger.Log(e, "Failed to retrive linktypes from Jira");
@@ -74,7 +75,6 @@ namespace JiraExport
                 jira.RestClient.RestSharpClient.AddDefaultHeader("X-Atlassian-Token", "no-check");
                 if (jiraSettings.UsingJiraCloud)
                     jira.RestClient.Settings.EnableUserPrivacyMode = true;
-
             }
             catch (Exception ex)
             {
@@ -168,7 +168,7 @@ namespace JiraExport
             Directory.CreateDirectory(dir);
         }
 
-        public IEnumerable<JiraItem> EnumerateIssues(string jql, HashSet<string> skipList, DownloadOptions downloadOptions)
+        public IEnumerable<IJiraItem> EnumerateIssues(string jql, HashSet<string> skipList, DownloadOptions downloadOptions)
         {
             var currentStart = 0;
             IEnumerable<string> remoteIssueBatch = null;
@@ -256,6 +256,7 @@ namespace JiraExport
         public struct JiraVersion
         {
             public string Version { get; set; }
+
             public string DeploymentType { get; set; }
 
             public JiraVersion(string version, string deploymentType)
@@ -279,7 +280,6 @@ namespace JiraExport
                 Logger.Log(e, $"Failed to get item count using query: '{jql}'");
                 return 0;
             }
-
         }
 
         public JiraVersion GetJiraVersion()
@@ -309,7 +309,6 @@ namespace JiraExport
                 Logger.Log(e, $"Failed to download issue with key: {key}");
                 return default(JObject);
             }
-
         }
 
         public async Task<List<RevisionAction<JiraAttachment>>> DownloadAttachments(JiraRevision rev)

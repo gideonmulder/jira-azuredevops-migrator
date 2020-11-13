@@ -8,12 +8,14 @@ namespace JiraExport
     public enum RevisionChangeType
     {
         Added,
+
         Removed
     }
 
     public class RevisionAction<T>
     {
         public RevisionChangeType ChangeType { get; set; }
+
         public T Value { get; set; }
 
         public override string ToString()
@@ -29,18 +31,20 @@ namespace JiraExport
         public string Author { get; set; }
 
         public Dictionary<string, object> Fields { get; set; }
+
         public List<RevisionAction<JiraLink>> LinkActions { get; set; }
 
         public List<RevisionAction<JiraAttachment>> AttachmentActions { get; set; }
-        public JiraItem ParentItem { get; private set; }
+
+        public IJiraItem ParentItem { get; private set; }
+
         public int Index { get; internal set; }
 
         public string OriginId => ParentItem.Key;
 
         public string Type => ParentItem.Type;
 
-
-        public JiraRevision(JiraItem parentItem)
+        public JiraRevision(IJiraItem parentItem)
         {
             ParentItem = parentItem;
         }

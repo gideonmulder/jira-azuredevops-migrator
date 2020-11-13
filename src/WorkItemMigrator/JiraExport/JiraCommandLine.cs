@@ -19,6 +19,7 @@ namespace JiraExport
     public class JiraCommandLine
     {
         private CommandLineApplication commandLineApplication;
+
         private string[] args;
 
         public JiraCommandLine(params string[] args)
@@ -41,6 +42,7 @@ namespace JiraExport
 
             CommandOption userOption = commandLineApplication.Option("-u <username>", "Username for authentication", CommandOptionType.SingleValue);
             CommandOption passwordOption = commandLineApplication.Option("-p <password>", "Password for authentication", CommandOptionType.SingleValue);
+            CommandOption useOfflineBackupOption = commandLineApplication.Option("-useofflinebackup", "Uses offline backup, enter the location of the extracted backup folder", CommandOptionType.SingleValue);
             CommandOption urlOption = commandLineApplication.Option("--url <accounturl>", "Url for the account", CommandOptionType.SingleValue);
             CommandOption configOption = commandLineApplication.Option("--config <configurationfilename>", "Export the work items based on this configuration file", CommandOptionType.SingleValue);
             CommandOption forceOption = commandLineApplication.Option("--force", "Forces execution from start (instead of continuing from previous run)", CommandOptionType.NoValue);
@@ -52,7 +54,7 @@ namespace JiraExport
 
                 if (configOption.HasValue())
                 {
-                    ExecuteMigration(userOption, passwordOption, urlOption, configOption, forceFresh, continueOnCriticalOption);
+                    ExecuteMigration(userOption, passwordOption, useOfflineBackupOption, urlOption, configOption, forceFresh, continueOnCriticalOption);
                 }
                 else
                 {
@@ -63,7 +65,7 @@ namespace JiraExport
             });
         }
 
-        private void ExecuteMigration(CommandOption user, CommandOption password, CommandOption url, CommandOption configFile, bool forceFresh, CommandOption continueOnCritical)
+        private void ExecuteMigration(CommandOption user, CommandOption password, CommandOption useOfflineBackup, CommandOption url, CommandOption configFile, bool forceFresh, CommandOption continueOnCritical)
         {
             var itemsCount = 0;
             var exportedItemsCount = 0;
@@ -92,8 +94,15 @@ namespace JiraExport
                     JQL = config.Query,
                     UsingJiraCloud = config.UsingJiraCloud
                 };
-
-                JiraProvider jiraProvider = JiraProvider.Initialize(jiraSettings);
+                IJiraProvider jiraProvider = null;
+                if (useOfflineBackup.HasValue())
+                {
+                    jiraProvider = OfflineJiraProvider.Initialize(useOfflineBackup.Value(), jiraSettings);
+                }
+                else
+                {
+                    jiraProvider = JiraProvider.Initialize(jiraSettings);
+                }
 
                 itemsCount = jiraProvider.GetItemCount(jiraSettings.JQL);
 
@@ -150,7 +159,7 @@ namespace JiraExport
             Logger.Init("jira-export", config.Workspace, config.LogLevel, continueOnCritical);
         }
 
-        private static void BeginSession(string configFile, ConfigJson config, bool force, JiraProvider jiraProvider, int itemsCount)
+        private static void BeginSession(string configFile, ConfigJson config, bool force, IJiraProvider jiraProvider, int itemsCount)
         {
             var toolVersion = VersionInfo.GetVersionInfo();
             var osVersion = System.Runtime.InteropServices.RuntimeInformation.OSDescription.Trim();
