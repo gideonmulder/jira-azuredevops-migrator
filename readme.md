@@ -1,6 +1,6 @@
 # About this fork
 
-I created a dirty version to use a backup from Jira and use that as export, since Basic Authentication is deprecated by Jira (Cloud version)
+I created a dirty version to use a backup from Jira and use that as export, in case when you don't have the Jira license anymore
 
 # Jira to Azure DevOps work item migration tool
 
