@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 
 namespace JiraExport
 {
-    public class JiraItem
+    public class JiraItem : IJiraItem
     {
         #region Static
 
@@ -30,7 +30,6 @@ namespace JiraExport
             Logger.Log(LogLevel.Debug, $"Created {revisions.Count} history revisions.");
 
             return jiraItem;
-
         }
 
         private static List<JiraRevision> BuildRevisions(JiraItem jiraItem, JiraProvider jiraProvider)
@@ -46,7 +45,6 @@ namespace JiraExport
             var createdOn = fields.TryGetValue("created", out object crdate) ? (DateTime)crdate : default(DateTime);
             if (createdOn == DateTime.MinValue)
                 Logger.Log(LogLevel.Debug, "created key was not found, using DateTime default value");
-
 
             var changelog = jiraProvider.DownloadChangelog(issueKey).ToList();
             Logger.Log(LogLevel.Debug, $"Downloaded issue: {issueKey} changelog.");
@@ -220,7 +218,6 @@ namespace JiraExport
             if (jira.Jira.RestClient.Settings.Cache.CustomFields.TryGetValue(fieldName, out var customField))
                 return customField.Id;
             else return null;
-
         }
 
         private static void UndoLinkChange(RevisionAction<JiraLink> linkChange, List<JiraLink> links)
@@ -321,6 +318,7 @@ namespace JiraExport
         }
 
         private static Dictionary<string, Func<JToken, object>> _fieldExtractionMapping = null;
+
         private static Dictionary<string, object> ExtractFields(string key, JObject remoteIssue, JiraProvider jira)
         {
             var fields = new Dictionary<string, object>();
@@ -398,17 +396,18 @@ namespace JiraExport
 
             return fields;
         }
+
         private static string GetAuthor(Dictionary<string, object> fields)
         {
             var reporter = fields.TryGetValue("reporter", out object rep) ? (string)rep : null;
 
             return GetAuthorIdentityOrDefault(reporter);
         }
+
         private static string GetAuthor(JObject change)
         {
             var author = change.ExValue<string>("$.author.name") ?? change.ExValue<string>("$.author.accountId");
             return GetAuthorIdentityOrDefault(author);
-
         }
 
         private static string GetAuthorIdentityOrDefault(string author)
@@ -417,7 +416,6 @@ namespace JiraExport
                 return default(string);
 
             return author;
-
         }
 
         private static string[] ParseCustomField(string fieldName, JToken value, JiraProvider provider)
@@ -434,12 +432,14 @@ namespace JiraExport
             return serializedValue;
         }
 
-        #endregion
+        #endregion Static
 
         private readonly JiraProvider _provider;
 
         public string Key { get { return RemoteIssue.ExValue<string>("$.key"); } }
+
         public string Type { get { return RemoteIssue.ExValue<string>("$.fields.issuetype.name")?.Trim(); } }
+
         public string EpicParent
         {
             get
@@ -450,20 +450,26 @@ namespace JiraExport
                     return null;
             }
         }
+
         public string Parent { get { return RemoteIssue.ExValue<string>("$.fields.parent.key"); } }
+
         public List<string> SubItems { get { return GetSubTasksKey(); } }
 
         public JObject RemoteIssue { get; private set; }
+
         public List<JiraRevision> Revisions { get; set; }
+
         private JiraItem(JiraProvider provider, JObject remoteIssue)
         {
             this._provider = provider;
             RemoteIssue = remoteIssue;
         }
+
         internal string GetUserEmail(string author)
         {
             return _provider.GetUserEmail(author);
         }
+
         internal List<string> GetSubTasksKey()
         {
             return RemoteIssue.SelectTokens("$.fields.subtasks.[*]", false).Select(st => st.ExValue<string>("$.key")).ToList();

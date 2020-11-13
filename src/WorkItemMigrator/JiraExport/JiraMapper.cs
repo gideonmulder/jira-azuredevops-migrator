@@ -13,12 +13,15 @@ namespace JiraExport
 {
     internal class JiraMapper : BaseMapper<JiraRevision>
     {
-        private readonly JiraProvider _jiraProvider;
+        private readonly IJiraProvider _jiraProvider;
+
         private readonly Dictionary<string, FieldMapping<JiraRevision>> _fieldMappingsPerType;
+
         private readonly HashSet<string> _targetTypes;
+
         private readonly ConfigJson _config;
 
-        public JiraMapper(JiraProvider jiraProvider, ConfigJson config) : base(jiraProvider?.Settings?.UserMappingFile)
+        public JiraMapper(IJiraProvider jiraProvider, ConfigJson config) : base(jiraProvider?.Settings?.UserMappingFile)
         {
             _jiraProvider = jiraProvider;
             _config = config;
@@ -83,7 +86,6 @@ namespace JiraExport
             {
                 var changeType = value == null ? ReferenceChangeType.Removed : ReferenceChangeType.Added;
                 var linkType = (from t in _config.LinkMap.Links where t.Source == type select t.Target).FirstOrDefault();
-
 
                 if (changeType == ReferenceChangeType.Added)
                 {
@@ -154,7 +156,7 @@ namespace JiraExport
             return base.MapUser(email);
         }
 
-        internal WiItem Map(JiraItem issue)
+        internal WiItem Map(IJiraItem issue)
         {
             var wiItem = new WiItem();
 
@@ -216,7 +218,6 @@ namespace JiraExport
             // map epic child
             MapEpicChildLink(r, links, "epic child", "Child");
 
-
             return links;
         }
 
@@ -234,7 +235,6 @@ namespace JiraExport
                 }
             }
         }
-
 
         private List<WiAttachment> MapAttachments(JiraRevision rev)
         {
@@ -337,27 +337,35 @@ namespace JiraExport
                             case "MapTitle":
                                 value = r => MapTitle(r);
                                 break;
+
                             case "MapTitleWithoutKey":
                                 value = r => MapTitleWithoutKey(r);
                                 break;
+
                             case "MapUser":
                                 value = IfChanged<string>(item.Source, isCustomField, MapUser);
                                 break;
+
                             case "MapSprint":
                                 value = IfChanged<string>(item.Source, isCustomField, MapSprint);
                                 break;
+
                             case "MapTags":
                                 value = IfChanged<string>(item.Source, isCustomField, MapTags);
                                 break;
+
                             case "MapArray":
                                 value = IfChanged<string>(item.Source, isCustomField, MapArray);
                                 break;
+
                             case "MapRemainingWork":
                                 value = IfChanged<string>(item.Source, isCustomField, MapRemainingWork);
                                 break;
+
                             case "MapRendered":
                                 value = r => MapRenderedValue(r, item.Source, isCustomField);
                                 break;
+
                             default:
                                 value = IfChanged<string>(item.Source, isCustomField);
                                 break;
@@ -384,7 +392,7 @@ namespace JiraExport
                         }
                     }
 
-                    // Check if not-for has been set, if so get all work item types except that one, else for has been set and get those                 
+                    // Check if not-for has been set, if so get all work item types except that one, else for has been set and get those
                     var currentWorkItemTypes = !string.IsNullOrWhiteSpace(item.NotFor) ? GetWorkItemTypes(item.NotFor.Split(',')) : item.For.Split(',').ToList();
 
                     foreach (var wit in currentWorkItemTypes)
@@ -408,7 +416,6 @@ namespace JiraExport
                                 }
                             }
                         }
-
                         catch (Exception)
                         {
                             Logger.Log(LogLevel.Warning, $"Ignoring target mapping with key: '{item.Target}', because it is already configured.");
@@ -427,8 +434,6 @@ namespace JiraExport
 
             return mappingPerWiType;
         }
-
-
 
         private object MapRemainingWork(string seconds)
         {
@@ -471,6 +476,7 @@ namespace JiraExport
             else
                 return (false, null);
         }
+
         private (bool, object) MapTitleWithoutKey(JiraRevision r)
         {
             if (r.Fields.TryGetValue("summary", out object summary))
@@ -600,9 +606,8 @@ namespace JiraExport
                 htmlValue = "<style>" + css + "</style>" + htmlValue;
 
             return htmlValue;
-
         }
 
-        #endregion
+        #endregion Mapping definitions
     }
 }

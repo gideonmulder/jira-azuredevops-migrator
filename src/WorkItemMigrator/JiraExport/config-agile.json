@@ -1,0 +1,320 @@
+{
+  "source-project": "SourceProject",
+  "target-project": "TargetProject",
+  "query": "project=ProjectName ORDER BY Rank ASC",
+  "using-jira-cloud": true,
+  "workspace": "D:\\VS19GMUL\\jira-azuredevops-migrator\\src\\WorkItemMigrator\\JiraExport\\bin\\Debug",
+  "epic-link-field": "Epic Link",
+  "sprint-field": "Sprint",
+  "download-options": 7,
+  "batch-size": 20,
+  "log-level": "Info",
+  "attachment-folder": "Attachments",
+  "user-mapping-file": "users.txt",
+  "base-area-path": "Migrated",
+  "base-iteration-path": "Migrated",
+  "ignore-failed-links": true,
+  "process-template": "Agile",
+  "link-map": {
+    "link": [
+      {
+        "source": "Epic",
+        "target": "System.LinkTypes.Hierarchy-Reverse"
+      },
+      {
+        "source": "Parent",
+        "target": "System.LinkTypes.Hierarchy-Reverse"
+      },
+      {
+        "source": "Relates",
+        "target": "System.LinkTypes.Related"
+      },
+      {
+        "source": "Duplicate",
+        "target": "System.LinkTypes.Duplicate-Forward"
+      }
+    ]
+  },
+  "type-map": {
+    "type": [
+      {
+        "source": "10000",
+        "target": "Epic"
+      },
+      {
+        "source": "Story",
+        "target": "Feature"
+      },
+      {
+        "source": "10006",
+        "target": "Bug"
+      },
+      {
+        "source": "10003",
+        "target": "User Story"
+      },
+      {
+        "source": "10005",
+        "target": "Task"
+      },
+      {
+        "source": "10004",
+        "target": "Task"
+      }
+    ]
+  },
+  "field-map": {
+    "field": [
+      {
+        "source": "summary",
+        "target": "System.Title",
+        "mapper": "MapTitle"
+      },
+      {
+        "source": "assignee",
+        "target": "System.AssignedTo",
+        "mapper": "MapUser"
+      },
+      {
+        "source": "description",
+        "target": "System.Description",
+        "mapper": "MapRendered"
+      },
+      {
+        "source": "priority",
+        "target": "Microsoft.VSTS.Common.Priority",
+        "mapping": {
+          "values": [
+            {
+              "source": "find here: https://[yourtenant].atlassian.net/secure/admin/ViewPriorities.jspa (edit action has the id)",
+              "target": "1"
+            },
+            {
+              "source": "1",
+              "target": "1"
+            },
+            {
+              "source": "2",
+              "target": "2"
+            },
+            {
+              "source": "3",
+              "target": "3"
+            },
+            {
+              "source": "4",
+              "target": "3"
+            },
+            {
+              "source": "5",
+              "target": "4"
+            }
+          ]
+        }
+      },
+      {
+        "source": "labels",
+        "target": "System.Tags",
+        "mapper": "MapTags"
+      },
+      {
+        "source": "comment",
+        "target": "System.History",
+        "mapper": "MapRendered"
+      },
+      {
+        "source": "status",
+        "target": "System.State",
+        "for": "Feature,Epic,User Story,Bug",
+        "mapping": {
+          "values": [
+            {
+              "source": "find here the ids:https://[yourtenant].atlassian.net/secure/admin/ViewStatuses.jspa The edit action has a href",
+              "target": "New"
+            },
+            {
+              "source": "1",
+              "target": "New"
+            },
+            {
+              "source": "4",
+              "target": "New"
+            },
+            {
+              "source": "10004",
+              "target": "New"
+            },
+            {
+              "source": "10005",
+              "target": "New"
+            },
+            {
+              "source": "10007",
+              "target": "New"
+            },
+            {
+              "source": "10008",
+              "target": "New"
+            },
+            {
+              "source": "10009",
+              "target": "New"
+            },
+            {
+              "source": "To Do",
+              "target": "New"
+            },
+            {
+              "source": "3",
+              "target": "Active"
+            },
+            {
+              "source": "400",
+              "target": "Active"
+            },
+            {
+              "source": "401",
+              "target": "Active"
+            },
+            {
+              "source": "10010",
+              "target": "Active"
+            },
+            {
+              "source": "10011",
+              "target": "Active"
+            },
+            {
+              "source": "10015",
+              "target": "Active"
+            },
+            {
+              "source": "10006",
+              "target": "Closed"
+            },
+            {
+              "source": "6",
+              "target": "Closed"
+            },
+            {
+              "source": "5",
+              "target": "Closed"
+            },
+            {
+              "source": "Removed",
+              "target": "Removed"
+            }
+          ]
+        }
+      },
+      {
+        "source": "status",
+        "target": "System.State",
+        "for": "Task",
+        "mapping": {
+          "values": [
+            {
+              "source": "find here the ids:https://[yourtenant].atlassian.net/secure/admin/ViewStatuses.jspa The edit action has a href",
+              "target": "New"
+            },
+            {
+              "source": "1",
+              "target": "New"
+            },
+            {
+              "source": "4",
+              "target": "New"
+            },
+            {
+              "source": "10004",
+              "target": "New"
+            },
+            {
+              "source": "10005",
+              "target": "New"
+            },
+            {
+              "source": "10007",
+              "target": "New"
+            },
+            {
+              "source": "10008",
+              "target": "New"
+            },
+            {
+              "source": "10009",
+              "target": "New"
+            },
+            {
+              "source": "To Do",
+              "target": "New"
+            },
+            {
+              "source": "3",
+              "target": "Active"
+            },
+            {
+              "source": "400",
+              "target": "Active"
+            },
+            {
+              "source": "401",
+              "target": "Active"
+            },
+            {
+              "source": "10010",
+              "target": "Active"
+            },
+            {
+              "source": "10011",
+              "target": "Active"
+            },
+            {
+              "source": "10015",
+              "target": "Active"
+            },
+            {
+              "source": "10006",
+              "target": "Closed"
+            },
+            {
+              "source": "6",
+              "target": "Closed"
+            },
+            {
+              "source": "5",
+              "target": "Closed"
+            },
+            {
+              "source": "Removed",
+              "target": "Removed"
+            }
+          ]
+        }
+      },
+      {
+        "source": "Story Points",
+        "source-type": "name",
+        "target": "Microsoft.VSTS.Scheduling.StoryPoints",
+        "not-for": "Task"
+      },
+      {
+        "source": "timeestimate",
+        "target": "Microsoft.VSTS.Scheduling.RemainingWork",
+        "mapper": "MapRemainingWork",
+        "for": "Bug,Task"
+      },
+      {
+        "source": "description",
+        "target": "Microsoft.VSTS.TCM.ReproSteps",
+        "for": "Bug"
+      },
+      {
+        "source": "environment",
+        "source-type": "name",
+        "target": "Microsoft.VSTS.TCM.SystemInfo",
+        "for": "Bug,Epic"
+      }
+    ]
+  }
+}
