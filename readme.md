@@ -1,3 +1,7 @@
+# About this fork
+
+I created a dirty version to use a backup from Jira and use that as export, since Basic Authentication is deprecated by Jira (Cloud version)
+
 # Jira to Azure DevOps work item migration tool
 
 The Jira to Azure DevOps work item migration tool lets you export data from Jira and import it as work items in Azure DevOps or Microsoft Team Foundation Server.
